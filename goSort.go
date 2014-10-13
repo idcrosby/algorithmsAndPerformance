@@ -8,14 +8,14 @@ import (
 	)
 
 func main() {
-	test(generateRandomArray(1000000))
+	test(generateRandomArray(10000))
 }
 
 func test(input []int) {
 	// fmt.Println("Input: " + arrayToString(input))
 	start := time.Now()
-	// output := BubbleSort(input)
-	output := input
+	output := BubbleSort(input)
+	// output := input
 	elapsed := time.Since(start)
 	if isSorted(output) {
 		fmt.Printf("Bubble sort passed. Took: %s\n", elapsed)
@@ -55,7 +55,35 @@ func test(input []int) {
 		fmt.Println("Combo sort failed: " + arrayToString(output))
 	}
 	// fmt.Println("Output: " + arrayToString(output))
+
+	TestForTrend(MergeSort, 100000, 1000)
 }
+
+func TestForTrend(fn sort, maxSize, step int) {
+
+	// var output int[]
+	for i := step; i < maxSize; i = i+step {
+		var avgTime time.Duration
+		input := generateRandomArray(i)
+		var totalTime time.Duration;
+		for j := 0; j < 10; j++ {
+			start := time.Now()
+			output := fn(input)
+			elapsed := time.Since(start)
+			totalTime += elapsed
+			if !isSorted(output) {
+				fmt.Println("Error. Array sorting failed")
+				return
+			}
+		}
+		avgTime = totalTime / 10;
+		// avgTime = int(totalTime.Nanoseconds() / int64(10)) * time.Nanosecond
+		fmt.Printf("Average Time for input size %d is %s\n", i, avgTime)
+	}
+}
+
+// Type to represent generic sort function
+type sort func([]int) []int
 
 func BubbleSort(input []int) []int {
 
@@ -94,9 +122,6 @@ func SelectionSort(input []int) []int {
 			newMin = input[min]
 			input[min] = input[pointer]
 			input[pointer] = newMin
-			// fmt.Printf("Swapping index %d with minimum %d at index %d \n", pointer, newMin, min)
-			// fmt.Println("" + arrayToString(input))
-
 		}
 	}
 	return input
