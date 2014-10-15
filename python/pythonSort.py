@@ -17,8 +17,12 @@ def insertionSort(input):
 		for j, v2 in enumerate(input[:i]):
 			if v < v2:
 				# shift and insert
+				# print("before: "),
+				# printList(input)
 				input[j+1:i+1] = input[j:i]
-				input[j] = v2
+				input[j] = v
+				# print("after: "),
+				# printList(input)
 				break
 
 def bubbleSort(input):
@@ -26,13 +30,12 @@ def bubbleSort(input):
 	done = False
 	while not done:
 		done = True
-		for i, v, in enumerate(input[:-1]):
-			if v > input[i+1]:
+		for i, v, in enumerate(input):
+			if i+1 < len(input) and v > input[i+1]:
 				# swap
 				input[i] = input[i+1]
 				input[i+1] = v
 				done = False
-
 
 # Util Methods
 
@@ -57,7 +60,7 @@ def listsEqual(list1, list2):
 def generateArray(size):
 	output = []
 	for x in range(0, size):
-		output.append(random.randint(-10,10))
+		output.append(random.randint(-100,100))
 	return output
 
 def printList(input):
@@ -73,21 +76,28 @@ li = original[:]
 printList(original)
 print "SelectionSort. Before: Sorted? " + `isSorted(li)`
 selectionSort(li)
-print "SelectionSort. After: Sorted? " + `isSorted(li)`
-print "Same list? " + `listsEqual(original, li)`
-# printList(sorted)
-printList(li)
+if isSorted(li) and listsEqual(li, original):
+	print "SelectionSort Success"
+else:
+	print "SelectionSort Failed"
+	print printList(li)
 
 li = original[:]
 print "InsertionSort. Before: Sorted? " + `isSorted(li)`
 insertionSort(li)
-print "InsertionSort. After: Sorted? " + `isSorted(li)`
-print "Same list? " + `listsEqual(li, original)`
-printList(li)
+if isSorted(li) and listsEqual(li, original):
+	print "insertionSort Success"
+else:
+	print "insertionSort Failed"
+	print printList(li)
 
 li = original[:]
 print "BubbleSort. Before: Sorted? " + `isSorted(li)`
 bubbleSort(li)
-print "BubbleSort. After: Sorted? " + `isSorted(li)`
-print "Same list? " + `listsEqual(li, original)`
+if isSorted(li) and listsEqual(li, original):
+	print "BubbleSort Success"
+else:
+	print "bubbleSort Failed"
+	print printList(li)
+
 printList(li)
