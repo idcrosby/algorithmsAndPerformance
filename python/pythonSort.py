@@ -37,6 +37,38 @@ def bubbleSort(input):
 				input[i+1] = v
 				done = False
 
+def mergeSort(input):
+	if len(input) < 2:
+		return input
+
+	split = len(input) / 2
+
+	return merge(mergeSort(input[:split]), mergeSort(input[split:]))
+
+def merge(first, second):
+
+	size = len(first) + len(second)
+	result = []
+
+	firstPointer = 0
+	secondPointer = 0
+	for x in range(0, size):
+		if firstPointer == len(first):
+			for el in second[secondPointer:]:
+				result.append(el)
+			break
+		elif secondPointer == len(second):
+			for el in first[firstPointer:]:
+				result.append(el)
+			break
+		elif first[firstPointer] < second[secondPointer]:
+			result.append(first[firstPointer])
+			firstPointer += 1
+		else:
+			result.append(second[secondPointer])
+			secondPointer += 1
+	return result
+
 # Util Methods
 
 def isSorted(input):
@@ -65,13 +97,14 @@ def generateArray(size):
 
 def printList(input):
 	print("["),
-	for val in input:
+	for i, val in enumerate(input):
 		print(val),
-		print(','),
+		if i < len(input) -1:
+			print(','),
 	print("]")
 
 
-original = generateArray(20)
+original = generateArray(10)
 li = original[:]
 printList(original)
 print "SelectionSort. Before: Sorted? " + `isSorted(li)`
@@ -100,4 +133,13 @@ else:
 	print "bubbleSort Failed"
 	print printList(li)
 
-printList(li)
+li = original[:]
+print "MergeSort. Before: Sorted? " + `isSorted(li)`
+result = mergeSort(li)
+if isSorted(result) and listsEqual(result, original):
+	print "MergeSort Success"
+else:
+	print "MergeSort Failed"
+	print printList(result)
+
+printList(result)
