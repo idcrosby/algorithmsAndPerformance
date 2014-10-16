@@ -4,62 +4,95 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"sort"
 	"time"
 	)
 
 func main() {
-	test(generateRandomArray(10000))
+
+	var result = make([]int, 10)
+	for i, _ := range result {
+		result[i] = rand.Intn(102)
+	}
+	input := result //generateRandomArray(10)
+	fmt.Println("Input: " + arrayToString(input))
+	fmt.Println("closestPair: " + arrayToString(ClosestPair(input)))
+	test(generateRandomArray(100000))
 }
 
 func test(input []int) {
 	// fmt.Println("Input: " + arrayToString(input))
+	inputCopy := make([]int, len(input))
+	copy(inputCopy, input)
 	start := time.Now()
-	output := BubbleSort(input)
-	// output := input
+	output := BubbleSort(inputCopy)
 	elapsed := time.Since(start)
-	if isSorted(output) {
+	if isSorted(output) && arraysEqual(output, input) {
 		fmt.Printf("Bubble sort passed. Took: %s\n", elapsed)
 	} else {
 		// fmt.Println("Bubble sort failed: " + arrayToString(output))
 	}
+
+	inputCopy = make([]int, len(input))
+	copy(inputCopy, input)
 	start = time.Now()
-	output = InsertionSort(input)
+	output = InsertionSort(inputCopy)
 	elapsed = time.Since(start)
-	if isSorted(output) {
+	if isSorted(output) && arraysEqual(output, input) {
 		fmt.Printf("Insertion sort passed. Took: %s\n", elapsed)
 	} else {
 		fmt.Println("Insertion sort failed: " + arrayToString(output))
 	}
+
+	inputCopy = make([]int, len(input))
+	copy(inputCopy, input)
 	start = time.Now()
-	output = SelectionSort(input)
+	output = SelectionSort(inputCopy)
 	elapsed = time.Since(start)
-	if isSorted(output) {
+	if isSorted(output) && arraysEqual(output, input) {
 		fmt.Printf("Selection sort passed. Took: %s\n", elapsed)
 	} else {
 		fmt.Println("Selection sort failed: " + arrayToString(output))
 	}
+
+	inputCopy = make([]int, len(input))
+	copy(inputCopy, input)
 	start = time.Now()
-	output = MergeSort(input)
+	output = MergeSort(inputCopy)
 	elapsed = time.Since(start)
-	if isSorted(output) {
+	if isSorted(output) && arraysEqual(output, input) {
 		fmt.Printf("Merge sort passed. Took: %s\n", elapsed)
 	} else {
 		fmt.Println("Merge sort failed: " + arrayToString(output))
 	}
+
+	inputCopy = make([]int, len(input))
+	copy(inputCopy, input)
 	start = time.Now()
-	output = ComboMergeInsertionSort(input)
+	output = ComboMergeInsertionSort(inputCopy)
 	elapsed = time.Since(start)
-	if isSorted(output) {
+	if isSorted(output) && arraysEqual(output, input) {
 		fmt.Printf("Combo sort passed. Took: %s\n", elapsed)
 	} else {
 		fmt.Println("Combo sort failed: " + arrayToString(output))
 	}
 	// fmt.Println("Output: " + arrayToString(output))
 
-	TestForTrend(MergeSort, 100000, 1000)
+	inputCopy = make([]int, len(input))
+	copy(inputCopy, input)
+	start = time.Now()
+	sort.Ints(inputCopy)
+	elapsed = time.Since(start)
+	if isSorted(inputCopy) && arraysEqual(inputCopy, input) {
+		fmt.Printf("Built-in sort passed. Took: %s\n", elapsed)
+	} else {
+		fmt.Println("Built-in sort failed: " + arrayToString(inputCopy))
+	}
+
+	// TestForTrend(MergeSort, 100000, 1000)
 }
 
-func TestForTrend(fn sort, maxSize, step int) {
+func TestForTrend(fn sortFunc, maxSize, step int) {
 
 	// var output int[]
 	for i := step; i < maxSize; i = i+step {
@@ -83,7 +116,7 @@ func TestForTrend(fn sort, maxSize, step int) {
 }
 
 // Type to represent generic sort function
-type sort func([]int) []int
+type sortFunc func([]int) []int
 
 func BubbleSort(input []int) []int {
 
@@ -228,6 +261,24 @@ func merge(inOne []int, inTwo []int) []int {
 	return result
 }
 
+func ClosestPair(input []int) []int {
+	sorted := MergeSort(input)
+	result := sorted[:2]
+	dist := result[1] - result[0]
+	for i := 2; i < len(sorted); i++ {
+		if newDist := sorted[i] - sorted[i-1]; newDist < dist {
+			result[0] = sorted[i-1]
+			result[1] = sorted[i]
+			dist = newDist
+		}
+	}
+	return result
+}
+
+func ClosestPair2D(input [][]int) [][]int {
+	return nil
+}
+
 
 // Util methods
 
@@ -255,6 +306,24 @@ func isSorted(input []int) bool {
 		}
 	}
 	return true
+}
+
+func arraysEqual(one, two []int) bool {
+
+	copyOne := make([]int, len(one))
+	copy(copyOne, one)
+	copyTwo := make([]int, len(two))
+	copy(copyTwo, two)
+
+	for _, el := range copyOne {
+		for j, el2 := range copyTwo {
+			if el == el2 {
+				copyTwo = append(copyTwo[:j], copyTwo[j+1:]...)
+				break
+			}
+		}
+	}
+	return len(copyTwo) == 0
 }
 
 // Create an array of integers of specified size
