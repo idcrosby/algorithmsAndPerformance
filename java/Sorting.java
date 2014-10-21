@@ -9,37 +9,52 @@ public class Sorting {
 		
 		// for (int i = 0; i < 10; i++;) {
 			System.out.println("Sorting...");
-			int[] input = generateRandomArray(10000);
+			int[] input = generateRandomArray(100000);
 			int[] newInput = new int[input.length];
 			System.arraycopy(input, 0, newInput, 0, input.length);
 			// System.out.println("Input: " + arrayToString(input));
 			long start = System.currentTimeMillis();
-			int[] output = bubbleSort(input);
+			int[] output = bubbleSort(newInput);
 			long elapsed = System.currentTimeMillis() - start;
 			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) ? "Success" : "Failed");
+			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
 			System.out.println(" BubbleSort Took " + elapsed + "ms.");
 
+			newInput = new int[input.length];
+			System.arraycopy(input, 0, newInput, 0, input.length);
 			start = System.currentTimeMillis();
 			output = insertionSort(newInput);
 			elapsed = System.currentTimeMillis() - start;
 			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) ? "Success" : "Failed");
+			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
 			System.out.println(" InsertionSort Took " + elapsed + "ms.");		
 
+			newInput = new int[input.length];
+			System.arraycopy(input, 0, newInput, 0, input.length);
 			start = System.currentTimeMillis();
 			output = selectionSort(newInput);
 			elapsed = System.currentTimeMillis() - start;
 			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) ? "Success" : "Failed");
+			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
 			System.out.println(" SelectionSort Took " + elapsed + "ms.");		
 
+			newInput = new int[input.length];
+			System.arraycopy(input, 0, newInput, 0, input.length);
 			start = System.currentTimeMillis();
 			output = mergeSort(newInput);
 			elapsed = System.currentTimeMillis() - start;
 			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) ? "Success" : "Failed");
+			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
 			System.out.println(" MergeSort Took " + elapsed + "ms.");
+
+			newInput = new int[input.length];
+			System.arraycopy(input, 0, newInput, 0, input.length);
+			start = System.currentTimeMillis();
+			Arrays.sort(newInput, 0, newInput.length);
+			elapsed = System.currentTimeMillis() - start;
+			// System.out.println("Output: " + arrayToString(output));
+			System.out.print(isSorted(newInput) && compareArrays(newInput, input) ? "Success" : "Failed");
+			System.out.println(" Built-in Took " + elapsed + "ms.");
 		// }
 	}
 
@@ -142,6 +157,30 @@ public class Sorting {
 			if (input[i-1] > input[i])
 				return false;
 		}
+		return true;
+	}
+
+	private static boolean compareArrays(int[] inputOne, int[] inputTwo) {
+		if (inputOne.length != inputTwo.length)
+			return false;
+
+		int[] copyTwo = new int[inputTwo.length];
+		int[] used = new int[inputTwo.length];
+		System.arraycopy(inputTwo, 0, copyTwo, 0, inputTwo.length);
+		for (int i = 0; i < inputOne.length; i++) {
+			for (int j = 0; j < copyTwo.length; j++) {
+				if (used[j] != 1 && inputOne[i] == copyTwo[j]) {
+					used[j] = 1;
+					break;
+				}
+			}
+		}
+
+		for (int i = 0; i < used.length; i++) {
+			if (used[i] != 1)
+				return false;
+		}
+
 		return true;
 	}
 
