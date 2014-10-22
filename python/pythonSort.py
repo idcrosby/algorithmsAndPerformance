@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 
 def selectionSort(input):
 	for i, v in enumerate(input):
@@ -103,43 +104,74 @@ def printList(input):
 			print(','),
 	print("]")
 
+def toReadable(timeDelta):
+	timeString = ""
+	hours, remainder = divmod(timeDelta.seconds, 3600)
+	minutes, seconds = divmod(remainder, 60)
+	milliseconds = timeDelta.microseconds // 1000
+	if hours > 0:
+		timeString += str(hour) + ":" + str(minutes) + ":"
+	elif minutes > 0:
+		timeString += str(minutes) + ":"
+	
+	milliString = str(milliseconds)
+	if milliseconds < 10:
+		milliString = "00" + str(milliseconds)
+	elif milliseconds < 100:
+		milliString = "0" + str(milliseconds)
 
-original = generateArray(10)
+	timeString += str(seconds) + "." + milliString + " seconds"
+	return timeString
+
+original = generateArray(10000)
 li = original[:]
-printList(original)
-print "SelectionSort. Before: Sorted? " + `isSorted(li)`
+# printList(original)
+start = datetime.now()
 selectionSort(li)
+runTime = datetime.now() - start
 if isSorted(li) and listsEqual(li, original):
-	print "SelectionSort Success"
+	print "SelectionSort Success. Ran in " + toReadable(runTime)
 else:
 	print "SelectionSort Failed"
 	print printList(li)
 
 li = original[:]
-print "InsertionSort. Before: Sorted? " + `isSorted(li)`
+start = datetime.now()
 insertionSort(li)
+runTime = datetime.now() - start
 if isSorted(li) and listsEqual(li, original):
-	print "insertionSort Success"
+	print "InsertionSort Success. Ran in " + toReadable(runTime)
 else:
 	print "insertionSort Failed"
 	print printList(li)
 
 li = original[:]
-print "BubbleSort. Before: Sorted? " + `isSorted(li)`
+start = datetime.now()
 bubbleSort(li)
-if isSorted(li) and listsEqual(li, original):
-	print "BubbleSort Success"
+runTime = datetime.now() - start
+if isSorted(li) and listsEqual(li, original) and not isSorted(original):
+	print "BubbleSort Success. Ran in " + toReadable(runTime)
 else:
 	print "bubbleSort Failed"
 	print printList(li)
 
 li = original[:]
-print "MergeSort. Before: Sorted? " + `isSorted(li)`
+start = datetime.now()
 result = mergeSort(li)
+runTime = datetime.now() - start
 if isSorted(result) and listsEqual(result, original):
-	print "MergeSort Success"
+	print "MergeSort Success. Ran in " + toReadable(runTime)
 else:
 	print "MergeSort Failed"
 	print printList(result)
 
-printList(result)
+li = original[:]
+start = datetime.now()
+li.sort()
+runTime = datetime.now() - start
+if isSorted(li) and listsEqual(li, original):
+	print "Built-in Sort Success. Ran in " + toReadable(runTime)
+else:
+	print "MergeSort Failed"
+	print printList(li)
+# printList(result)
