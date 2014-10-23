@@ -1,5 +1,6 @@
 import random
 from datetime import datetime
+import argparse
 
 def selectionSort(input):
 	for i, v in enumerate(input):
@@ -18,12 +19,8 @@ def insertionSort(input):
 		for j, v2 in enumerate(input[:i]):
 			if v < v2:
 				# shift and insert
-				# print("before: "),
-				# printList(input)
 				input[j+1:i+1] = input[j:i]
 				input[j] = v
-				# print("after: "),
-				# printList(input)
 				break
 
 def bubbleSort(input):
@@ -123,9 +120,23 @@ def toReadable(timeDelta):
 	timeString += str(seconds) + "." + milliString + " seconds"
 	return timeString
 
-original = generateArray(10000)
+
+parser = argparse.ArgumentParser(description='pass in file with list of ints')
+parser.add_argument('-f', '--file')
+parser.add_argument('-s', '--size', type=int, default=1000)
+parser.add_argument('-v', '--verbose')
+
+args = parser.parse_args()
+if args.file:
+	original = open(args.file).read().splitlines()
+else:
+	original = generateArray(args.size)
+
 li = original[:]
-# printList(original)
+
+if args.verbose:
+	printList(original)
+print "Sorting " + str(len(original)) + " items."
 start = datetime.now()
 selectionSort(li)
 runTime = datetime.now() - start
@@ -174,4 +185,6 @@ if isSorted(li) and listsEqual(li, original):
 else:
 	print "MergeSort Failed"
 	print printList(li)
-# printList(result)
+
+if args.verbose:
+	printList(result)

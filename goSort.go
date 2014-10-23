@@ -1,27 +1,50 @@
 package main
 
 import (
+	"bufio"
+	"flag"
 	"fmt"
 	"math/rand"
+	"os"
 	"strconv"
 	"sort"
 	"time"
 	)
 
+var Verbose bool
+
 func main() {
 
-	var result = make([]int, 10)
-	for i, _ := range result {
-		result[i] = rand.Intn(102)
+	// Define flags
+	fileName := flag.String("file", "", "File which contains array.")
+	arraySize := flag.Int("size", 10000, "Size of array to generate.")
+	flag.BoolVar(&Verbose, "verbose", false, "Turn on verbose logging.")
+	flag.Parse()
+
+	// var result = make([]int, 10)
+	// for i, _ := range result {
+		// result[i] = rand.Intn(102)
+	// }
+	// input := result //generateRandomArray(10)
+	// fmt.Println("Input: " + arrayToString(input))
+	// fmt.Println("closestPair: " + arrayToString(ClosestPair(input)))
+
+	var input []int
+	if len(*fileName) > 0 {
+		input = readArrayFromFile(*fileName)	
+	} else {
+		input = generateRandomArray(*arraySize)
 	}
-	input := result //generateRandomArray(10)
-	fmt.Println("Input: " + arrayToString(input))
-	fmt.Println("closestPair: " + arrayToString(ClosestPair(input)))
-	test(generateRandomArray(100000))
+	// input := readArrayFromFile("IntegerArray.txt")
+	fmt.Println("Sorting " + strconv.Itoa(len(input)) + " items...")
+	test(input)
 }
 
 func test(input []int) {
-	// fmt.Println("Input: " + arrayToString(input))
+	if Verbose {
+		fmt.Println("Input: " + arrayToString(input))
+	}
+
 	inputCopy := make([]int, len(input))
 	copy(inputCopy, input)
 	start := time.Now()
@@ -69,6 +92,18 @@ func test(input []int) {
 	inputCopy = make([]int, len(input))
 	copy(inputCopy, input)
 	start = time.Now()
+	counter := 0
+	counter, output = InversionCount(inputCopy)
+	elapsed = time.Since(start)
+	if isSorted(output) && arraysEqual(output, input) {
+		fmt.Printf("Inversion sort passed. Took: %s and found %d inversions\n", elapsed, counter)
+	} else {
+		fmt.Println("Merge sort failed: " + arrayToString(output))
+	}
+
+	inputCopy = make([]int, len(input))
+	copy(inputCopy, input)
+	start = time.Now()
 	output = ComboMergeInsertionSort(inputCopy)
 	elapsed = time.Since(start)
 	if isSorted(output) && arraysEqual(output, input) {
@@ -89,6 +124,9 @@ func test(input []int) {
 		fmt.Println("Built-in sort failed: " + arrayToString(inputCopy))
 	}
 
+	if Verbose {
+		fmt.Println("Output: " + arrayToString(inputCopy))
+	}
 	// TestForTrend(MergeSort, 100000, 1000)
 }
 
@@ -232,6 +270,55 @@ func ComboMergeInsertionSort(input []int) []int {
 	}
 }
 
+func InversionCount(input []int) (count int, merged []int) {
+	size := len(input)
+	if size < 2 {
+		// Already sorted return
+		return 0, input
+	} else {
+		var split int
+		if size % 2 == 0 {
+			split = size/2
+		} else {
+			split = (size+1)/2
+		}
+		count1, mergedFirst := InversionCount(input[0:split])
+		count2, mergedSecond := InversionCount(input[split:size])
+		mergedCount, merged := mergeAndCount(mergedFirst, mergedSecond)
+		return mergedCount + count1 + count2, merged
+	}
+}
+
+func mergeAndCount(inOne []int, inTwo []int) (count int, merged []int) {
+	i, j := 0, 0
+	count = 0
+	sizeOne := len(inOne)
+	sizeTwo := len(inTwo)
+	sizeTotal := sizeOne + sizeTwo
+	var result = make([]int, sizeTotal)
+
+	for k := 0; k < sizeTotal; k++ {
+
+		// Check if either array is empty
+		if i == sizeOne {
+			copy(result[k:len(result)], inTwo[j:len(inTwo)])
+			break
+		} else if j == sizeTwo {
+			copy(result[k:len(result)], inOne[i:len(inOne)])
+			break
+		} else if inOne[i] <= inTwo[j] {
+			result[k] = inOne[i]
+			i++
+		} else {
+			result[k] = inTwo[j]
+			count += (sizeOne - i)
+			j++
+		}
+	}
+
+	return count, result
+}
+
 func merge(inOne []int, inTwo []int) []int {
 
 	i, j := 0, 0
@@ -248,7 +335,7 @@ func merge(inOne []int, inTwo []int) []int {
 			break
 		} else if j == sizeTwo {
 			copy(result[k:len(result)], inOne[i:len(inOne)])
-			break;
+			break
 		} else if inOne[i] < inTwo[j] {
 			result[k] = inOne[i]
 			i++
@@ -281,6 +368,28 @@ func ClosestPair2D(input [][]int) [][]int {
 
 
 // Util methods
+
+func readArrayFromFile(fileName string) []int {
+	result := []int{}
+	requestsFile, err := os.Open(fileName)
+	if err != nil {
+		fmt.Printf("Error opening file: ", err)
+		// TODO return error
+		return nil
+	}
+
+	reader := bufio.NewReader(requestsFile)
+	scanner := bufio.NewScanner(reader)
+
+	i := 0
+	for scanner.Scan() {
+		val, _ := strconv.Atoi(scanner.Text())
+		// result[i] = val
+		result = append(result, val)
+		i++
+	}
+	return result
+}
 
 func arrayToString(input []int) string {
 
@@ -331,7 +440,8 @@ func generateRandomArray(size int) []int {
 
 	var result = make([]int, size)
 	for i, _ := range result {
-		result[i] = rand.Int()
+		// result[i] = rand.Int()
+		result[i] = int(rand.Int31n(16))	
 	}
 	return result
 }

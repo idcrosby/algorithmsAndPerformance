@@ -1,61 +1,96 @@
 import java.util.Random;
 import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.File;
+import java.io.IOException;
 
 public class Sorting {
 	
 
 	public static void main(String[] args) {
 
+		boolean verbose = false;
+		int size = 1000;
+		String fileName = "";
+		int[] input = null;
+
+		for (int i = 0; i < args.length; i++) {
+			if ("verbose".equalsIgnoreCase(args[i]))
+				verbose = true;
+			else {
+				try {
+					size = Integer.parseInt(args[i]);
+				} catch (NumberFormatException e) {
+					// must be file
+					fileName = args[i];
+				}
+			}
+		}
+
+		if (fileName != "") {
+			try {
+				input = readArrayFromFile(fileName);
+			} catch (IOException e) {
+				// ignore
+			}
+		} else {
+			input = generateRandomArray(size);
+		}
+		System.out.println("Sorting " + input.length + " items...");
+
+		int[] newInput = new int[input.length];
+		System.arraycopy(input, 0, newInput, 0, input.length);
+		if (verbose)
+			System.out.println("Input: " + arrayToString(input));
 		
-		// for (int i = 0; i < 10; i++;) {
-			System.out.println("Sorting...");
-			int[] input = generateRandomArray(100000);
-			int[] newInput = new int[input.length];
-			System.arraycopy(input, 0, newInput, 0, input.length);
-			// System.out.println("Input: " + arrayToString(input));
-			long start = System.currentTimeMillis();
-			int[] output = bubbleSort(newInput);
-			long elapsed = System.currentTimeMillis() - start;
-			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
-			System.out.println(" BubbleSort Took " + elapsed + "ms.");
+		long start = System.currentTimeMillis();
+		int[] output = bubbleSort(newInput);
+		long elapsed = System.currentTimeMillis() - start;
+		// System.out.println("Output: " + arrayToString(output));
+		System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
+		System.out.println(" BubbleSort Took " + elapsed + "ms.");
 
-			newInput = new int[input.length];
-			System.arraycopy(input, 0, newInput, 0, input.length);
-			start = System.currentTimeMillis();
-			output = insertionSort(newInput);
-			elapsed = System.currentTimeMillis() - start;
-			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
-			System.out.println(" InsertionSort Took " + elapsed + "ms.");		
+		newInput = new int[input.length];
+		System.arraycopy(input, 0, newInput, 0, input.length);
+		start = System.currentTimeMillis();
+		output = insertionSort(newInput);
+		elapsed = System.currentTimeMillis() - start;
+		// System.out.println("Output: " + arrayToString(output));
+		System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
+		System.out.println(" InsertionSort Took " + elapsed + "ms.");		
 
-			newInput = new int[input.length];
-			System.arraycopy(input, 0, newInput, 0, input.length);
-			start = System.currentTimeMillis();
-			output = selectionSort(newInput);
-			elapsed = System.currentTimeMillis() - start;
-			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
-			System.out.println(" SelectionSort Took " + elapsed + "ms.");		
+		newInput = new int[input.length];
+		System.arraycopy(input, 0, newInput, 0, input.length);
+		start = System.currentTimeMillis();
+		output = selectionSort(newInput);
+		elapsed = System.currentTimeMillis() - start;
+		// System.out.println("Output: " + arrayToString(output));
+		System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
+		System.out.println(" SelectionSort Took " + elapsed + "ms.");		
 
-			newInput = new int[input.length];
-			System.arraycopy(input, 0, newInput, 0, input.length);
-			start = System.currentTimeMillis();
-			output = mergeSort(newInput);
-			elapsed = System.currentTimeMillis() - start;
-			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
-			System.out.println(" MergeSort Took " + elapsed + "ms.");
+		newInput = new int[input.length];
+		System.arraycopy(input, 0, newInput, 0, input.length);
+		start = System.currentTimeMillis();
+		output = mergeSort(newInput);
+		elapsed = System.currentTimeMillis() - start;
+		// System.out.println("Output: " + arrayToString(output));
+		System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
+		System.out.println(" MergeSort Took " + elapsed + "ms.");
 
-			newInput = new int[input.length];
-			System.arraycopy(input, 0, newInput, 0, input.length);
-			start = System.currentTimeMillis();
-			Arrays.sort(newInput, 0, newInput.length);
-			elapsed = System.currentTimeMillis() - start;
-			// System.out.println("Output: " + arrayToString(output));
-			System.out.print(isSorted(newInput) && compareArrays(newInput, input) ? "Success" : "Failed");
-			System.out.println(" Built-in Took " + elapsed + "ms.");
-		// }
+		newInput = new int[input.length];
+		System.arraycopy(input, 0, newInput, 0, input.length);
+		start = System.currentTimeMillis();
+		Arrays.sort(newInput, 0, newInput.length);
+		elapsed = System.currentTimeMillis() - start;
+		// System.out.println("Output: " + arrayToString(output));
+		System.out.print(isSorted(newInput) && compareArrays(newInput, input) ? "Success" : "Failed");
+		System.out.println(" Built-in Took " + elapsed + "ms.");
+		
+		if (verbose)
+			System.out.println("Output: " + arrayToString(newInput));
 	}
 
 	public static int[] insertionSort(int[] input) {
@@ -206,4 +241,20 @@ public class Sorting {
 		return buf.toString();
 	}
 
+	private static int[] readArrayFromFile(String fileName) throws IOException {
+		List<Integer> result = new ArrayList<Integer>();
+		File file = new File(fileName);
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			result.add(Integer.parseInt(line));
+		}
+		reader.close();
+
+		int[] arrayResult = new int[result.size()];
+		for(int i = 0; i < arrayResult.length; i++)
+    		arrayResult[i] = result.get(i);
+		
+		return arrayResult;
+	}
 }
