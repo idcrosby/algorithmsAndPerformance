@@ -116,6 +116,17 @@ func test(input []int) {
 	inputCopy = make([]int, len(input))
 	copy(inputCopy, input)
 	start = time.Now()
+	QuickSort(inputCopy)
+	elapsed = time.Since(start)
+	if isSorted(inputCopy) && arraysEqual(inputCopy, input) {
+		fmt.Printf("Quicksort passed. Took: %s\n", elapsed)
+	} else {
+		fmt.Println("Quicksort failed: " + arrayToString(inputCopy))
+	}
+
+	inputCopy = make([]int, len(input))
+	copy(inputCopy, input)
+	start = time.Now()
 	sort.Ints(inputCopy)
 	elapsed = time.Since(start)
 	if isSorted(inputCopy) && arraysEqual(inputCopy, input) {
@@ -268,6 +279,65 @@ func ComboMergeInsertionSort(input []int) []int {
 		}
 		return merge(MergeSort(input[0:split]), MergeSort(input[split:size]))
 	}
+}
+
+func QuickSort(input []int) {
+
+	size := len(input)
+
+	// base case
+	if size < 2 {
+		return
+	}
+
+	// pick pivot
+	pivot := 0
+
+	// partition
+	pivotValue := input[pivot]
+	newPivot := partition(input, pivot)
+	if Verbose {
+		fmt.Printf("Pivot %d put in position %d\n", pivotValue, newPivot)
+	}
+
+	// recurse
+	QuickSort(input[:newPivot])
+	QuickSort(input[newPivot+1:])
+}
+
+func partition(input []int, pivot int) int {
+
+	if pivot != 0 {
+		swap(input, pivot, 0)
+		pivot = 0
+	}
+
+	pivotVal := input[pivot]
+	size := len(input)
+
+	low, high := 0, size-1
+	currentPos := 1
+	for (high - low) >= 1 {
+		if input[currentPos] < pivotVal {
+			swap(input, currentPos, low)
+			low++
+			currentPos++
+			pivot++
+		} else {
+			swap(input, currentPos, high)
+			high--
+		}
+	}
+	return pivot
+}
+
+func swap(input []int, pos1, pos2 int) {
+	if Verbose {
+		fmt.Printf("Swapping %d and %d.\n", pos1, pos2)
+	}
+	holder := input[pos1]
+	input[pos1] = input[pos2]
+	input[pos2] = holder
 }
 
 func InversionCount(input []int) (count int, merged []int) {
@@ -438,10 +508,12 @@ func arraysEqual(one, two []int) bool {
 // Create an array of integers of specified size
 func generateRandomArray(size int) []int {
 
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var result = make([]int, size)
 	for i, _ := range result {
 		// result[i] = rand.Int()
-		result[i] = int(rand.Int31n(16))	
+		// result[i] = int(rand.Int31n(16))	
+		result[i] = int(r.Int31n(100))		
 	}
 	return result
 }
