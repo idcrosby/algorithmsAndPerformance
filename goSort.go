@@ -12,6 +12,7 @@ import (
 	)
 
 var Verbose bool
+var Rando *rand.Rand
 
 func main() {
 
@@ -21,6 +22,7 @@ func main() {
 	flag.BoolVar(&Verbose, "verbose", false, "Turn on verbose logging.")
 	flag.Parse()
 
+	Rando = rand.New(rand.NewSource(time.Now().UnixNano()))
 	// var result = make([]int, 10)
 	// for i, _ := range result {
 		// result[i] = rand.Intn(102)
@@ -291,21 +293,45 @@ func QuickSort(input []int) {
 	}
 
 	// pick pivot
-	pivot := 0
+	pivot := choosePivot(input, size)
+	// if Verbose {
+		fmt.Printf("Pivot chosen as: %d\n", pivot)
+	// }
 
 	// partition
 	pivotValue := input[pivot]
 	newPivot := partition(input, pivot)
-	if Verbose {
-		fmt.Printf("Pivot %d put in position %d\n", pivotValue, newPivot)
-	}
 
 	// recurse
 	QuickSort(input[:newPivot])
 	QuickSort(input[newPivot+1:])
 }
+func choosePivot(input []int, size int) int {
+	return Rando.Intn(size)	
+}
 
 func partition(input []int, pivot int) int {
+
+	if pivot != 0 {
+		swap(input, pivot, 0)
+		pivot = 0
+	}
+
+	pivotVal := input[pivot]
+	size := len(input)
+
+	i := 1
+	for j := 1; j < size; j++ {
+		if input[j] < pivotVal {
+			swap(input, j, i)
+			i++
+		}
+	}
+	swap(input, pivot, i-1)
+	return i-1
+}
+
+func partition_old(input []int, pivot int) int {
 
 	if pivot != 0 {
 		swap(input, pivot, 0)
@@ -333,7 +359,7 @@ func partition(input []int, pivot int) int {
 
 func swap(input []int, pos1, pos2 int) {
 	if Verbose {
-		fmt.Printf("Swapping %d and %d.\n", pos1, pos2)
+		fmt.Printf("Swapping %d and %d.\n", input[pos1], input[pos2])
 	}
 	holder := input[pos1]
 	input[pos1] = input[pos2]
@@ -508,12 +534,12 @@ func arraysEqual(one, two []int) bool {
 // Create an array of integers of specified size
 func generateRandomArray(size int) []int {
 
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	// r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var result = make([]int, size)
 	for i, _ := range result {
 		// result[i] = rand.Int()
 		// result[i] = int(rand.Int31n(16))	
-		result[i] = int(r.Int31n(100))		
+		result[i] = int(Rando.Int31n(100))
 	}
 	return result
 }
