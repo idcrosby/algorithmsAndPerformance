@@ -13,7 +13,7 @@ public class Sorting {
 	public static void main(String[] args) {
 
 		boolean verbose = false;
-		int size = 1000;
+		int size = 5;
 		String fileName = "";
 		int[] input = null;
 
@@ -79,6 +79,15 @@ public class Sorting {
 		// System.out.println("Output: " + arrayToString(output));
 		System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
 		System.out.println(" MergeSort Took " + elapsed + "ms.");
+
+		newInput = new int[input.length];
+		System.arraycopy(input, 0, newInput, 0, input.length);
+		start = System.currentTimeMillis();
+		output = quickSort(newInput, 0, input.length);
+		elapsed = System.currentTimeMillis() - start;
+		// System.out.println("Output: " + arrayToString(output));
+		System.out.print(isSorted(output) && compareArrays(output, input) ? "Success" : "Failed");
+		System.out.println(" QuickSort Took " + elapsed + "ms.");
 
 		newInput = new int[input.length];
 		System.arraycopy(input, 0, newInput, 0, input.length);
@@ -186,24 +195,71 @@ public class Sorting {
 	}
 
 
-	private static void quickSort(int[] input, int start, int end) {
-
-		int size = start - end;
+	private static int[] quickSort(int[] input, int start, int end) {
+		// System.out.println("quick sort " + start + " : " + end);
+		int size = end - start;
 		// base case
 		if (size < 2)
-			return;
+			return input;
 
 		// Select Pivot
-		int pivot = start; 
-
+		// int pivot = start; 
+		int pivot = selectPivot(size) + start;
+		// System.out.println("Pivot : " + pivot + " Value: " + input[pivot]);
 		// Partition
 		// int newPivot = partition(input, pivot);
+		// TODO Partition inside method, otherwise need to pass back array and new position?
+		if (pivot != start) {
+			input = swap(input, start, pivot);
+		}
+
+		// System.out.println("Pre parition: " + arrayToString(input));
+
+		int pointerVal = input[start];
+		int pointerPos = start;
+		for (int i = start+1; i < end; i++) {
+			if (input[i] < pointerVal) {
+				pointerPos++;
+				input = swap(input, i, pointerPos);
+			}
+		}
+		input = swap(input, start, pointerPos);
+		// System.out.println("Post partition: " + arrayToString(input));
 
 		// Recurse
-		// quickSort(input, newPivot, )
+		input = quickSort(input, start, pointerPos+1);
+		input = quickSort(input, pointerPos+1, end);
+		return input;
 	}
 
+	private static int selectPivot(int size) {
+		return new Random().nextInt(size);
+	}
 
+	private static int partition(int[] input, int pivot) {
+
+		if (pivot != 0) {
+			swap(input, 0, pivot);
+		}
+
+		int pointerVal = input[0];
+		int pointerPos = 1;
+		for (int i = 1; i < input.length; i++) {
+			if (input[i] < pointerVal) {
+				swap(input, i, pointerPos);
+				pointerPos++;
+			}
+		}
+		input = swap(input, 0, pointerPos);
+		return pointerPos;
+	}
+
+	private static int[] swap(int[] input, int one, int two) {
+		int holder = input[one];
+		input[one] = input[two];
+		input[two] = holder;
+		return input;
+	}
 
 	// Util Methods
 
@@ -243,7 +299,7 @@ public class Sorting {
 		Random rand = new Random();
 		int[] random = new int[size];
 		for (int i = 0; i < size; i++) {
-			random[i] = rand.nextInt();
+			random[i] = rand.nextInt(20);
 		}
 		return random;
 	}

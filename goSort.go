@@ -294,9 +294,6 @@ func QuickSort(input []int) {
 
 	// pick pivot
 	pivot := choosePivot(input, size)
-	// if Verbose {
-		fmt.Printf("Pivot chosen as: %d\n", pivot)
-	// }
 
 	// partition
 	pivotValue := input[pivot]
