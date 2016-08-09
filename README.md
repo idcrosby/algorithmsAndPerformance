@@ -1,5 +1,7 @@
 Implementations of various algorithms in multiple programming languages with the goal of comparing performance between different algorithms across languages.
 
+[Contrinuting] (.github/CONTRIBUTING.md)
+
 TODO
 =====
 
